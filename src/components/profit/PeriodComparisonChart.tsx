@@ -92,86 +92,6 @@ export function PeriodComparisonChart({ data, isLoading }: PeriodComparisonChart
 
   return (
     <div className="space-y-6">
-      {/* Summary Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-950 dark:to-emerald-900 border-emerald-200 dark:border-emerald-800">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-emerald-100 dark:bg-emerald-800 rounded-lg">
-                <BarChart3 className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
-              </div>
-              <div>
-                <p className="text-sm text-emerald-600 dark:text-emerald-400">Today's Profit</p>
-                <p className="text-2xl font-bold text-emerald-900 dark:text-emerald-100">
-                  Rs. {formatNumber(todayProfit)}
-                </p>
-                <Badge variant={profitTrend === 'up' ? 'default' : 'destructive'} className="text-xs mt-1">
-                  {profitTrend === 'up' ? <TrendingUp className="h-3 w-3 mr-1" /> : <TrendingDown className="h-3 w-3 mr-1" />}
-                  vs daily avg
-                </Badge>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 border-blue-200 dark:border-blue-800">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-100 dark:bg-blue-800 rounded-lg">
-                <BarChart3 className="h-6 w-6 text-blue-600 dark:text-blue-400" />
-              </div>
-              <div>
-                <p className="text-sm text-blue-600 dark:text-blue-400">Weekly Profit</p>
-                <p className="text-2xl font-bold text-blue-900 dark:text-blue-100">
-                  Rs. {formatNumber(lastWeekProfit)}
-                </p>
-                <p className="text-xs text-blue-600 dark:text-blue-400">
-                  Last 7 days performance
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950 dark:to-purple-900 border-purple-200 dark:border-purple-800">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-purple-100 dark:bg-purple-800 rounded-lg">
-                <Calendar className="h-6 w-6 text-purple-600 dark:text-purple-400" />
-              </div>
-              <div>
-                <p className="text-sm text-purple-600 dark:text-purple-400">30-Day Profit</p>
-                <p className="text-2xl font-bold text-purple-900 dark:text-purple-100">
-                  Rs. {formatNumber(parseFloat(last30DaysData?.profit || '0'))}
-                </p>
-                <p className="text-xs text-purple-600 dark:text-purple-400">
-                  Monthly performance
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-950 dark:to-amber-900 border-amber-200 dark:border-amber-800">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-amber-100 dark:bg-amber-800 rounded-lg">
-                <TrendingUp className="h-6 w-6 text-amber-600 dark:text-amber-400" />
-              </div>
-              <div>
-                <p className="text-sm text-amber-600 dark:text-amber-400">Avg Margin</p>
-                <p className="text-2xl font-bold text-amber-900 dark:text-amber-100">
-                  {(chartData.reduce((sum, item) => sum + item.margin, 0) / chartData.length).toFixed(1)}%
-                </p>
-                <p className="text-xs text-amber-600 dark:text-amber-400">
-                  Across all periods
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
       {/* Charts */}
       <div className="grid gap-6 md:grid-cols-2">
         {/* Profit Comparison Bar Chart */}
@@ -224,7 +144,7 @@ export function PeriodComparisonChart({ data, isLoading }: PeriodComparisonChart
           </CardContent>
         </Card>
 
-        {/* Revenue & Profit Area Chart */}
+        {/* Revenue & Profit Line Chart */}
         <Card className="bg-gradient-to-br from-background to-muted/20 border-0 shadow-lg">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-xl bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
@@ -244,17 +164,7 @@ export function PeriodComparisonChart({ data, isLoading }: PeriodComparisonChart
               </div>
             </div>
             <ResponsiveContainer width="100%" height={300}>
-              <AreaChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                <defs>
-                  <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#3B82F6" stopOpacity={0.1}/>
-                  </linearGradient>
-                  <linearGradient id="profitGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#10B981" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#10B981" stopOpacity={0.1}/>
-                  </linearGradient>
-                </defs>
+              <LineChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--muted-foreground))" opacity={0.2} />
                 <XAxis 
                   dataKey="periodLabel" 
@@ -265,6 +175,15 @@ export function PeriodComparisonChart({ data, isLoading }: PeriodComparisonChart
                   height={60}
                 />
                 <YAxis 
+                  yAxisId="revenue"
+                  orientation="left"
+                  stroke="hsl(var(--muted-foreground))"
+                  fontSize={12}
+                  tickFormatter={(value) => formatNumber(value)}
+                />
+                <YAxis 
+                  yAxisId="profit"
+                  orientation="right"
                   stroke="hsl(var(--muted-foreground))"
                   fontSize={12}
                   tickFormatter={(value) => formatNumber(value)}
@@ -281,23 +200,25 @@ export function PeriodComparisonChart({ data, isLoading }: PeriodComparisonChart
                     name === 'revenueNum' ? 'Revenue' : 'Profit'
                   ]}
                 />
-                <Area
+                <Line
+                  yAxisId="revenue"
                   type="monotone"
                   dataKey="revenueNum"
                   stroke="#3B82F6"
-                  fillOpacity={1}
-                  fill="url(#revenueGradient)"
-                  strokeWidth={2}
+                  strokeWidth={3}
+                  dot={{ fill: '#3B82F6', strokeWidth: 2, r: 4 }}
+                  activeDot={{ r: 6, stroke: '#3B82F6', strokeWidth: 2 }}
                 />
-                <Area
+                <Line
+                  yAxisId="profit"
                   type="monotone"
                   dataKey="profitNum"
                   stroke="#10B981"
-                  fillOpacity={1}
-                  fill="url(#profitGradient)"
-                  strokeWidth={2}
+                  strokeWidth={3}
+                  dot={{ fill: '#10B981', strokeWidth: 2, r: 4 }}
+                  activeDot={{ r: 6, stroke: '#10B981', strokeWidth: 2 }}
                 />
-              </AreaChart>
+              </LineChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>

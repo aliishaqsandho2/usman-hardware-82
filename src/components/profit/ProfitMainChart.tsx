@@ -82,14 +82,23 @@ export default function ProfitMainChart() {
     sales: parseInt(trend.sales_count)
   }));
 
-  // Create yearly data (simplified - using available data)
-  const yearlyChartData = ytdSummary ? [{
-    period: "2025 YTD",
-    profit: parseFloat(ytdSummary.ytd_profit),
-    revenue: parseFloat(ytdSummary.ytd_revenue),
-    margin: parseFloat(ytdSummary.ytd_margin),
-    sales: parseInt(ytdSummary.ytd_sales)
-  }] : [];
+  // Create yearly data (with starting point to show progression)
+  const yearlyChartData = ytdSummary ? [
+    {
+      period: "Jan 1, 2025",
+      profit: 0,
+      revenue: 0,
+      margin: 0,
+      sales: 0
+    },
+    {
+      period: "2025 YTD",
+      profit: parseFloat(ytdSummary.ytd_profit),
+      revenue: parseFloat(ytdSummary.ytd_revenue),
+      margin: parseFloat(ytdSummary.ytd_margin),
+      sales: parseInt(ytdSummary.ytd_sales)
+    }
+  ] : [];
 
   if (isLoading) {
     return (
@@ -456,6 +465,16 @@ export default function ProfitMainChart() {
                 </div>
               </div>
             </div>
+            <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-emerald-500 rounded-full"></div>
+                <span>Profit</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                <span>Revenue</span>
+              </div>
+            </div>
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={yearlyChartData}>
                 <defs>
@@ -493,6 +512,14 @@ export default function ProfitMainChart() {
                   strokeWidth={4}
                   dot={{ fill: '#10B981', strokeWidth: 2, r: 6 }}
                   activeDot={{ r: 8, stroke: '#10B981', strokeWidth: 2 }}
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="revenue" 
+                  stroke="#3B82F6" 
+                  strokeWidth={3}
+                  dot={{ fill: '#3B82F6', strokeWidth: 2, r: 6 }}
+                  activeDot={{ r: 8, stroke: '#3B82F6', strokeWidth: 2 }}
                 />
               </LineChart>
             </ResponsiveContainer>

@@ -131,6 +131,14 @@ export interface TodayPerformance {
   today_sales: string;
 }
 
+export interface PeriodComparison {
+  period: string;
+  start_date: string;
+  end_date: string;
+  revenue: string;
+  profit: string;
+}
+
 // Generic API request function
 const apiRequest = async <T>(
   endpoint: string,
@@ -204,4 +212,7 @@ export const profitApi = {
 
   getTodayPerformance: () =>
     apiRequest<TodayPerformance>('/reports/today-performance'),
+
+  getPeriodComparison: () =>
+    apiRequest<PeriodComparison[]>('/reports/period-comparison'),
 };

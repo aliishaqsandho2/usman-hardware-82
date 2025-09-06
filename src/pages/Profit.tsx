@@ -20,6 +20,7 @@ import {
   Clock
 } from "lucide-react";
 import ProfitMainChart from "@/components/profit/ProfitMainChart";
+import { PeriodComparisonChart } from "@/components/profit/PeriodComparisonChart";
 import {
   LineChart,
   Line,
@@ -55,9 +56,9 @@ const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899'
 
 // Overview Cards Component
 const OverviewCards = () => {
-  const { data: dailyProgress, isLoading: dailyLoading } = useQuery({
-    queryKey: ['profit-daily-progress'],
-    queryFn: profitApi.getDailyProgress,
+  const { data: periodComparison, isLoading: periodLoading } = useQuery({
+    queryKey: ['profit-period-comparison'],
+    queryFn: profitApi.getPeriodComparison,
   });
 
   const { data: keyMetrics, isLoading: metricsLoading } = useQuery({
@@ -65,22 +66,12 @@ const OverviewCards = () => {
     queryFn: profitApi.getKeyMetrics,
   });
 
-  const { data: ytdSummary, isLoading: ytdLoading } = useQuery({
-    queryKey: ['profit-ytd-summary'],
-    queryFn: profitApi.getYTDSummary,
-  });
-
-  const { data: weeklyPerformance, isLoading: weeklyLoading } = useQuery({
-    queryKey: ['profit-weekly-performance'],
-    queryFn: profitApi.getWeeklyPerformance,
-  });
-
-  const isLoading = dailyLoading || metricsLoading || ytdLoading || weeklyLoading;
+  const isLoading = periodLoading || metricsLoading;
 
   if (isLoading) {
     return (
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {Array.from({ length: 4 }).map((_, i) => (
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {Array.from({ length: 3 }).map((_, i) => (
           <Card key={i}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <Skeleton className="h-4 w-[100px]" />
@@ -96,13 +87,14 @@ const OverviewCards = () => {
     );
   }
 
-  const todayProfit = parseFloat(keyMetrics?.today_profit || '0');
+  const todayData = periodComparison?.find(p => p.period === 'today');
+  const lastWeekData = periodComparison?.find(p => p.period === 'last_week');
+  const todayProfit = parseFloat(todayData?.profit || keyMetrics?.today_profit || '0');
   const monthProfit = parseFloat(keyMetrics?.month_profit || '0');
-  const ytdProfit = parseFloat(ytdSummary?.ytd_profit || '0');
-  const lastWeekProfit = parseFloat(weeklyPerformance?.week_profit || '0');
+  const lastWeekProfit = parseFloat(lastWeekData?.profit || '0');
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
       <Card className="bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-950 dark:to-emerald-900 border-emerald-200 dark:border-emerald-800">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium text-emerald-700 dark:text-emerald-300">Today's Profit</CardTitle>
@@ -134,25 +126,7 @@ const OverviewCards = () => {
           </div>
           <p className="text-xs text-blue-600 dark:text-blue-400">
             <TrendingUp className="h-3 w-3 inline mr-1" />
-            {ytdSummary?.ytd_margin}% margin
-          </p>
-        </CardContent>
-      </Card>
-
-      <Card className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950 dark:to-purple-900 border-purple-200 dark:border-purple-800">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium text-purple-700 dark:text-purple-300">YTD Profit</CardTitle>
-          <div className="p-2 bg-purple-100 dark:bg-purple-800 rounded-full">
-            <BarChart3 className="h-4 w-4 text-purple-600 dark:text-purple-400" />
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold text-purple-900 dark:text-purple-100">
-            {formatCurrency(ytdProfit)}
-          </div>
-          <p className="text-xs text-purple-600 dark:text-purple-400">
-            <Star className="h-3 w-3 inline mr-1" />
-            {ytdSummary?.ytd_sales} total sales
+            5.01% margin
           </p>
         </CardContent>
       </Card>
@@ -1081,6 +1055,11 @@ const InsightsTab = () => {
 };
 
 export default function Profit() {
+  const { data: periodComparison, isLoading: periodLoading } = useQuery({
+    queryKey: ['profit-period-comparison'],
+    queryFn: profitApi.getPeriodComparison,
+  });
+
   return (
     <div className="container mx-auto p-3 space-y-3">
       {/* Header */}
@@ -1094,6 +1073,9 @@ export default function Profit() {
 
       {/* Overview Cards */}
       <OverviewCards />
+
+      {/* Period Comparison Section */}
+      <PeriodComparisonChart data={periodComparison || []} isLoading={periodLoading} />
 
       {/* Main Profit Chart */}
       <ProfitMainChart />
